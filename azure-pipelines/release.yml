@@ -34,12 +34,60 @@ steps:
   inputs:
     SourceFolder: '$(Agent.TempDirectory)/drop'
     TargetFolder: '$(System.DefaultWorkingDirectory)/sqltoolsservice/artifacts/package'
+# - task: PowerShell@2
+#   displayName: 'Run Automated Release Script'
+#   inputs:
+#     filePath: '$(System.DefaultWorkingDirectory)/CrossPlatBuildScripts/AutomatedReleases/sqltoolsserviceRelease.ps1'
+#     arguments: '-workspace $(System.DefaultWorkingDirectory)/sqltoolsservice -minTag v3.0.0.0 -target main -tagFormat release -isPrerelease $false -artifactsBuildId $(Build.BuildId)'
+#     workingDirectory: '$(System.DefaultWorkingDirectory)/sqltoolsservice'
+#   env:
+#     GITHUB_DISTRO_MIXIN_PASSWORD: $(github-distro-mixin-password)
+#     ADO_CROSSPLATBUILDSCRIPTS_PASSWORD: $(ado-crossplatbuildscripts-password)
+
 - task: PowerShell@2
-  displayName: 'Run Automated Release Script'
+  displayName: 'Package published projects'
   inputs:
-    filePath: '$(System.DefaultWorkingDirectory)/CrossPlatBuildScripts/AutomatedReleases/sqltoolsserviceRelease.ps1'
-    arguments: '-workspace $(System.DefaultWorkingDirectory)/sqltoolsservice -minTag v3.0.0.0 -target main -tagFormat release -isPrerelease $false -artifactsBuildId $(Build.BuildId)'
+    filePath: build.ps1
+    arguments: '-target=dotnetpackpublished -mono'
     workingDirectory: '$(System.DefaultWorkingDirectory)/sqltoolsservice'
-  env:
-    GITHUB_DISTRO_MIXIN_PASSWORD: $(github-distro-mixin-password)
-    ADO_CROSSPLATBUILDSCRIPTS_PASSWORD: $(ado-crossplatbuildscripts-password)
+  continueOnError: true
+
+- task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+  displayName: 'ESRP Code Signing - Nuget Package'
+  inputs:
+    ConnectedServiceName: 'Code Signing'
+    FolderPath: '$(System.DefaultWorkingDirectory)/sqltoolsservice/artifacts/nugetPackages'
+    Pattern: '*.nupkg'
+    signConfigType: 'inlineSignParams'
+    inlineOperation: |
+      [
+          {
+              "keyCode": "CP-401405",
+              "operationSetCode": "NuGetSign",
+              "parameters": [ ],
+              "toolName": "sign",
+              "toolVersion": "1.0"
+          },
+          {
+              "keyCode": "CP-401405",
+              "operationSetCode": "NuGetVerify",
+              "parameters": [ ],
+              "toolName": "sign",
+              "toolVersion": "1.0"
+          }
+      ]
+    SessionTimeout: '60'
+    MaxConcurrency: '50'
+    MaxRetryAttempts: '5'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: nuget packages'
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/sqltoolsservice/artifacts/nugetPackages'
+    ArtifactName: 'packages'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: logs'
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/sqltoolsservice/artifacts/logs'
+    ArtifactName: 'logs'

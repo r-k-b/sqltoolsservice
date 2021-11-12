@@ -1,18 +1,4 @@
 steps:
-- task: ArchiveFiles@1
-  displayName: 'Archive source '
-  inputs:
-    rootFolder: '$(Build.SourcesDirectory)'
-    includeRootFolder: false
-    archiveType: tar
-    archiveFile: '$(Build.ArtifactStagingDirectory)/source.tar.gz'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: source'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/source.tar.gz'
-    ArtifactName: source
-
 - task: UseDotNet@2
   displayName: 'Use defined .NET Core sdk'
   inputs:
@@ -126,40 +112,19 @@ steps:
     MaxConcurrency: 5
   condition: and(succeeded(), eq(variables['signed'], true))
 
-- task: BatchScript@1
-  displayName: 'Package published projects'
+- task: ArchiveFiles@1
+  displayName: 'Archive source '
   inputs:
-    filename: build.cmd
-    arguments: '-target=dotnetpackpublished -mono'
-  continueOnError: true
+    rootFolder: '$(Build.SourcesDirectory)'
+    includeRootFolder: false
+    archiveType: tar
+    archiveFile: '$(Build.ArtifactStagingDirectory)/source.tar.gz'
 
-- task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
-  displayName: 'ESRP Code Signing - Nuget Package'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: source'
   inputs:
-    ConnectedServiceName: 'Code Signing'
-    FolderPath: '$(Build.SourcesDirectory)/artifacts/nugetPackages'
-    Pattern: '*.nupkg'
-    signConfigType: 'inlineSignParams'
-    inlineOperation: |
-      [
-          {
-              "keyCode": "CP-401405",
-              "operationSetCode": "NuGetSign",
-              "parameters": [ ],
-              "toolName": "sign",
-              "toolVersion": "1.0"
-          },
-          {
-              "keyCode": "CP-401405",
-              "operationSetCode": "NuGetVerify",
-              "parameters": [ ],
-              "toolName": "sign",
-              "toolVersion": "1.0"
-          }
-      ]
-    SessionTimeout: '60'
-    MaxConcurrency: '50'
-    MaxRetryAttempts: '5'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/source.tar.gz'
+    ArtifactName: source
 
 - task: ArchiveFiles@1
   displayName: 'Archive osx build'
@@ -209,18 +174,6 @@ steps:
   displayName: 'Publish Artifact: build archives'
   inputs:
     PathtoPublish: '$(Build.SourcesDirectory)/artifacts/package'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: nuget packages'
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)/artifacts/nugetPackages'
-    ArtifactName: 'packages'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: logs'
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)/artifacts/logs'
-    ArtifactName: 'logs'
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
