@@ -16,6 +16,7 @@
     is a workaround to get releases out until the pipelines can be refactored to pass in
     the correct version -->
     <PackageVersion>3.0.0-release.163</PackageVersion>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/microsoft/sqltoolsservice/main/license.txt</PackageLicenseUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>license/license.txt</PackageLicenseFile>
     <PackageIcon>images\sqlserver.png</PackageIcon>
