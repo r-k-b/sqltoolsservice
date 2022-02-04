@@ -18,7 +18,6 @@
     <PackageVersion>3.0.0-release.163</PackageVersion>
     <PackageLicenseUrl>https://raw.githubusercontent.com/microsoft/sqltoolsservice/main/license.txt</PackageLicenseUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
-    <PackageLicenseFile>license/license.txt</PackageLicenseFile>
     <PackageIcon>images\sqlserver.png</PackageIcon>
     <PackageIconFullPath></PackageIconFullPath>
     <Authors>Microsoft</Authors>
@@ -29,7 +28,6 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="../license/license.txt" Pack="true" PackagePath="license/" />
     <None Include="../images/sqlserver.png" Pack="true" PackagePath="images/" />
     <None Include="../lib/_._" Pack="true" PackagePath="lib/$(TargetFramework)/" />
   </ItemGroup>
