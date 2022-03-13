@@ -48,3 +48,10 @@ mkdir -p bin/Debug/net6.0/zh-Hant
 # seems that files with unexpected casing from previous builds can contaminate
 # future builds.
 # (e.g., `./bin/nuget/`, `~/.nuget/packages`, `~/.local/share/NuGet/cache`)
+
+
+# prevent SRGen from breaking the build with the error:
+#    An error occurred when executing task 'SRGen'.
+#    Error: One or more errors occurred. (Object reference not set to an instance of an object)
+#            Object reference not set to an instance of an object
+rm src/Microsoft.SqlTools.ResourceProvider/Localization/sr.strings
