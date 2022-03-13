@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eou pipefail
+
 # standardize build-breaking case mismatches inside files (except this file)
 # For example, it should convert both `pt-br` and `pt-Br` to `pt-BR`.
 # See also: https://github.com/microsoft/sqltoolsservice/issues/886
